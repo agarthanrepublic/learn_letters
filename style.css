@@ -1,0 +1,369 @@
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; height: 100%; }
+
+body {
+  font-family: system-ui, sans-serif;
+  text-align: center;
+  background: #fdf6e3;
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;           /* phones: ignore the browser toolbar height */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overscroll-behavior: none;
+  /* keep clear of notches / home bar */
+  padding:
+    max(12px, env(safe-area-inset-top))
+    max(12px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom))
+    max(12px, env(safe-area-inset-left));
+}
+
+[hidden] { display: none !important; }
+
+h1 {
+  font-size: clamp(1.5rem, 7vw, 2.2rem);
+  margin: 0.3em 0 0.1em;
+}
+.hint {
+  color: #666;
+  margin: 0 0 8px;
+  font-size: clamp(1rem, 4.2vw, 1.2rem);
+  min-height: 1.5em;
+}
+
+button {
+  font: inherit;
+  font-size: 2rem;
+  padding: 20px;
+  border-radius: 12px;
+  border: none;
+  background: #4a90e2;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.1s, background 0.2s, opacity 0.2s;
+  touch-action: manipulation;          /* no double-tap zoom */
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Only use hover colours on devices with a real mouse (avoids "sticky" hover on phones) */
+@media (hover: hover) {
+  button:hover { background: #357abd; }
+  .time-option:hover { background: #e8f1fc; }
+  .time-option.selected:hover { background: #4a90e2; }
+  #start:hover { background: #256f46; }
+  #go-all-done:hover { background: #111; }
+  #replay:hover { background: #d98e14; }
+  #back:hover { background: #666; }
+}
+
+button:active { transform: scale(0.92); }
+button:disabled { opacity: 0.4; cursor: default; }
+
+/* ---------- Start screen ---------- */
+
+#start-screen {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(14px, 4vh, 30px);
+  margin-top: clamp(24px, 5vh, 48px);
+}
+
+.label { font-size: clamp(1.1rem, 5vw, 1.4rem); margin: 0; }
+
+#timer-options {
+  display: flex;
+  justify-content: center;
+  gap: clamp(6px, 2vw, 12px);
+  width: 100%;
+}
+
+.time-option {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 96px;
+  font-size: clamp(0.95rem, 4.2vw, 1.4rem);
+  padding: 0.65em 0.2em;
+  white-space: nowrap;
+  background: #fff;
+  color: #4a90e2;
+  border: 3px solid #4a90e2;
+}
+.time-option.selected {
+  background: #4a90e2;
+  color: #fff;
+}
+
+#start {
+  font-size: clamp(1.8rem, 9vw, 2.5rem);
+  padding: 0.5em 1.8em;
+  background: #2e8b57;
+}
+
+#go-all-done {
+  font-size: 1.2rem;
+  padding: 12px 28px;
+  background: #333;
+}
+
+/* ---------- Game ---------- */
+
+#game {
+  flex: 1;
+  width: 100%;
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(14px, 5vh, 40px);
+  padding-bottom: 3vh;
+}
+
+.game-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 22px;
+  width: 100%;
+}
+
+.timer, .score {
+  font-size: clamp(1.15rem, 5vw, 1.6rem);
+  margin: 0;
+  white-space: nowrap;
+}
+#time, #score { font-weight: bold; font-variant-numeric: tabular-nums; }
+#time.low { color: #d9534f; }
+
+#replay {
+  font-size: clamp(1rem, 4.5vw, 1.2rem);
+  padding: 0.6em 1.3em;
+  background: #f5a623;
+}
+
+/* ---------- Letter choices ---------- */
+
+#choices {
+  --n: 4;                                   /* set from app.js */
+  --gap: clamp(8px, 3vw, 20px);
+  /* as big as possible while keeping all letters on one row */
+  --size: min(130px, calc((100vw - 24px - (var(--n) - 1) * var(--gap)) / var(--n)), 24vh);
+  display: flex;
+  justify-content: center;
+  gap: var(--gap);
+}
+
+.letter {
+  width: var(--size);
+  height: var(--size);
+  font-size: calc(var(--size) * 0.5);
+  font-weight: bold;
+  padding: 0;
+  border-radius: calc(var(--size) * 0.12);
+}
+
+.letter.correct,
+.letter.correct:disabled {
+  background: #2e8b57;
+  opacity: 1;
+  animation: pop 0.4s ease-out;
+}
+
+.letter.wrong {
+  background: #d9534f;
+  animation: shake 0.4s;
+}
+
+@keyframes pop {
+  50% { transform: scale(1.2); }
+}
+
+@keyframes shake {
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+
+/* ---------- Caterpillar ----------
+   Everything is sized in em, so changing the font-size scales the whole caterpillar. */
+
+#caterpillar {
+  font-size: min(16px, 4.2vw, 2.6vh);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 9.5em;
+  padding: 2em 0 1em;
+}
+
+.seg {
+  position: relative;
+  flex: none;
+  width: 4em;
+  height: 4em;
+  margin-left: -1em;
+  border-radius: 50%;
+  background: #7cc242;
+  border: 0.19em solid #4e8f22;
+}
+.seg:nth-child(even) { background: #9ad65c; }
+.seg:first-child { margin-left: 0; }
+
+/* Little legs under each body segment */
+.seg:not(.head)::after {
+  content: "";
+  position: absolute;
+  bottom: -0.75em;
+  left: 50%;
+  width: 0.375em;
+  height: 0.875em;
+  margin-left: -0.19em;
+  border-radius: 0.19em;
+  background: #4e8f22;
+  z-index: -1;
+}
+
+.head {
+  width: 5em;
+  height: 5em;
+  background: #8fd14f;
+  z-index: 1;
+}
+
+.eye {
+  position: absolute;
+  top: 1.25em;
+  width: 1.375em;
+  height: 1.375em;
+  border-radius: 50%;
+  background: radial-gradient(circle at 60% 50%, #222 0 40%, #fff 42%);
+  border: 0.125em solid #333;
+}
+.eye.left  { left: 1em; }
+.eye.right { right: 0.75em; }
+
+.smile {
+  position: absolute;
+  bottom: 0.875em;
+  left: 50%;
+  width: 1.75em;
+  height: 0.875em;
+  margin-left: -0.75em;
+  border: 0.25em solid #333;
+  border-top: none;
+  border-radius: 0 0 1.75em 1.75em;
+}
+
+.antenna {
+  position: absolute;
+  top: -1.5em;
+  width: 0.25em;
+  height: 1.625em;
+  background: #4e8f22;
+  border-radius: 0.125em;
+}
+.antenna.left  { left: 1.375em; transform: rotate(-20deg); }
+.antenna.right { right: 1.375em; transform: rotate(20deg); }
+.antenna::after {
+  content: "";
+  position: absolute;
+  top: -0.5em;
+  left: -0.3125em;
+  width: 0.875em;
+  height: 0.875em;
+  border-radius: 50%;
+  background: #f5a623;
+}
+
+/* Wiggle: a wave travels from the head to the tail */
+#caterpillar.wiggle .seg {
+  animation: hump 0.6s ease-in-out 2;
+  animation-delay: calc(var(--i) * 80ms);
+}
+#caterpillar.wiggle .head {
+  animation: head-bob 0.6s ease-in-out 2;
+}
+
+@keyframes hump {
+  0%, 100% { transform: translateY(0); }
+  30%      { transform: translateY(-1.9em) scaleY(1.05); }
+  60%      { transform: translateY(0) scaleY(0.92); }
+}
+
+@keyframes head-bob {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  25%      { transform: translateY(-1.5em) rotate(-12deg); }
+  50%      { transform: translateY(0) rotate(0); }
+  75%      { transform: translateY(-0.75em) rotate(12deg); }
+}
+
+/* ---------- All Done screen ---------- */
+
+#all-done {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: #000;
+  color: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 2s ease-in; /* keep in sync with FADE_TIME in app.js */
+}
+#all-done.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Text and button appear once the screen has gone black */
+#all-done > * {
+  opacity: 0;
+  transition: opacity 1s ease-in;
+}
+#all-done.show > * {
+  opacity: 1;
+  transition-delay: 2s;
+}
+
+.all-done-text {
+  font-size: clamp(3rem, 16vw, 8rem);
+  font-weight: bold;
+  margin: 0;
+}
+
+.final-score { font-size: clamp(1.2rem, 5vw, 1.6rem); color: #ccc; min-height: 1.2em; }
+
+#back {
+  font-size: 1.1rem;
+  padding: 10px 24px;
+  margin-top: 30px;
+  background: #444;
+}
+
+/* ---------- Short screens (phones held sideways) ---------- */
+
+@media (max-height: 500px) {
+  h1 { font-size: 1.4rem; margin: 0; }
+  .hint { font-size: 0.95rem; margin-bottom: 4px; }
+  #start-screen { gap: 10px; padding-bottom: 0; }
+  .label { font-size: 1.1rem; }
+  .time-option { font-size: 1rem; padding: 0.45em 0.2em; }
+  #start { font-size: 1.6rem; padding: 0.35em 1.6em; }
+  #go-all-done { font-size: 1rem; padding: 8px 22px; }
+  #game { gap: 10px; padding-bottom: 0; }
+  .timer, .score { font-size: 1.1rem; }
+  #replay { font-size: 0.95rem; padding: 0.5em 1.1em; }
+  #back { margin-top: 16px; }
+}

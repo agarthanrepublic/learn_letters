@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#fdf6e3">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Find the Letter</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Find the Letter</h1>
+  <p class="hint" id="message">Listen, then tap the letter you hear</p>
+
+  <div id="start-screen">
+    <p class="label">How long do you want to play?</p>
+    <div id="timer-options">
+      <button class="time-option" data-minutes="1">1 min</button>
+      <button class="time-option" data-minutes="2">2 min</button>
+      <button class="time-option selected" data-minutes="3">3 min</button>
+      <button class="time-option" data-minutes="4">4 min</button>
+      <button class="time-option" data-minutes="5">5 min</button>
+    </div>
+    <button id="start">Start</button>
+    <button id="go-all-done">All Done</button>
+  </div>
+
+  <div id="game" hidden>
+    <div class="game-bar">
+      <p class="timer">Time left: <span id="time">3:00</span></p>
+      <button id="replay">Hear it again</button>
+      <p class="score">Score: <span id="score">0</span></p>
+    </div>
+
+    <div id="choices"></div>
+
+    <div id="caterpillar" aria-hidden="true">
+      <span class="seg" style="--i: 5"></span>
+      <span class="seg" style="--i: 4"></span>
+      <span class="seg" style="--i: 3"></span>
+      <span class="seg" style="--i: 2"></span>
+      <span class="seg" style="--i: 1"></span>
+      <span class="seg head" style="--i: 0">
+        <span class="antenna left"></span>
+        <span class="antenna right"></span>
+        <span class="eye left"></span>
+        <span class="eye right"></span>
+        <span class="smile"></span>
+      </span>
+    </div>
+  </div>
+
+  <div id="all-done" aria-live="polite">
+    <p class="all-done-text">All Done</p>
+    <p class="final-score" id="final-score"></p>
+    <button id="back">Back to start</button>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
